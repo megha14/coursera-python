@@ -1,0 +1,84 @@
+# template for "Stopwatch: The Game"
+
+# define global variables
+import simplegui
+import time
+minutes = ""
+tenthsec = ""
+int_timer = 0
+stop_mouse = 0
+stop_mouse_whole = 0
+watch_running = False
+
+# define helper function format that converts time
+# in tenths of seconds into formatted string A:BC.D
+def format(t):
+    global minutes, tenthsec
+    tenthsec = str(t % 600)
+    minutes = str(t // 600)
+    #print len(tenthsec)
+    
+    if len(tenthsec) == 1:
+        tenthsec = "00"+tenthsec
+    elif len(tenthsec) == 2:
+        tenthsec = "0"+tenthsec
+    #print tenthsec
+    message = minutes + ":" + tenthsec[0:2] + "." + tenthsec[2]
+    return message
+    
+def game_counter():
+    global stop_mouse, stop_mouse_whole, watch_running, tenthsec
+    if watch_running == False:
+        stop_mouse += 1
+    if tenthsec[2] == "0":
+        stop_mouse_whole += 1
+        
+# define event handlers for buttons; "Start", "Stop", "Reset"
+def start():
+    global watch_running
+    watch_running = True
+    timer.start()
+
+def stop():
+    global watch_running
+    if watch_running == True:
+        timer.stop()
+        watch_running = False
+        game_counter()
+        
+
+def reset():
+    global int_timer, stop_mouse, stop_mouse_whole
+    int_timer = 0
+    stop_mouse = 0
+    stop_mouse_whole = 0
+
+# define event handler for timer with 0.1 sec interval
+def increment_tenthsec():
+    global int_timer
+    int_timer += 1
+    
+
+# define draw handler
+def draw(canvas):
+    global stop_mouse_whole, stop_mouse
+    m = format(int_timer)
+    canvas.draw_text(m,[50, 100],40,"Red")
+    canvas.draw_text(str(stop_mouse_whole) + "/" + str(stop_mouse),[160,20],20,"White")
+    
+# create frame
+frame = simplegui.create_frame("The Stopwatch Game!!",200,200)
+timer = simplegui.create_timer(100,increment_tenthsec)
+
+# register event handlers
+frame.add_button("Start",start,100)
+frame.add_button("Stop",stop,100)
+frame.add_button("Reset",reset,100)
+frame.set_draw_handler(draw)
+
+
+
+# start frame
+frame.start()
+
+# Please remember to review the grading rubric
